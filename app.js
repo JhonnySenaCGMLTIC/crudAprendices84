@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 require('dotenv/config');
 const port = process.env.PUERTO || 3111;
+//body-parser
+app.use(express.json())
+
 //libreria para leer archivo
 const sistemaArchivo = require('fs');
 const ruta = require('path');
@@ -24,6 +27,51 @@ app.get('/api/aprendices', (req, res) => {
     });
 });
 
+//endpoint crear un aprendiz
+app.post("/api/aprendices", (req, res)=>{
+    const datoAprendiz = req.body
+    sistemaArchivo.readFile(rutaArchivoJson, "utf-8", (error, datos)=>{
+        if (error) {
+            res.status(500).json({ Error: "Error al leer el archivo, conxion bd" })
+        }
+        const listaAprendices = JSON.parse(datos);
+        //adicionar a la lista el nuevo aprendiz
+        listaAprendices.push(datoAprendiz)
+        //adicionar al archivo el nuevo aprendiz
+        sistemaArchivo.writeFile(rutaArchivoJson, JSON.stringify(listaAprendices,null, 2),(error)=>{
+            if(error){
+                res.status(500).json({Error: "No se puede registrar el aprendiz."})
+            }
+            res.json(datoAprendiz)
+        })
+        
+    })
+})
+
+//Endpoint para editar un aprendiz
+app.put("/api/aprendices/:dni", (req, res)=>{
+    const dni = parseInt(req.params.dni)
+    const datosAprendiz = req.body
+    sistemaArchivo.readFile(rutaArchivoJson, "utf-8", (error, datos)=>{
+        if (error) {
+            res.status(500).json({ Error: "Error al leer el archivo, conxion bd" })
+        }
+        let listaAprendices = JSON.parse(datos);
+        //modificar datos de un aprendiz
+
+        listaAprendices = listaAprendices.map(aprendiz => {
+                return aprendiz.dni === dni ? {...aprendiz, ...datosAprendiz } : aprendiz
+            })
+        //adicionar al archivo el nuevo aprendiz
+        sistemaArchivo.writeFile(rutaArchivoJson, JSON.stringify(listaAprendices,null, 2),(error)=>{
+            if(error){
+                res.status(500).json({Error: "No se puede registrar el aprendiz."})
+            }
+            res.json(datosAprendiz)
+        })
+        
+    })
+})
 
 
 // Modo de escucha del servidor
