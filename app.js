@@ -23,6 +23,9 @@ app.get('/api/aprendices', (req, res) => {
         res.json(listaAprendices);
     });
 });
+
+
+
 // Modo de escucha del servidor
 app.listen(port, () => {
     console.log(`SERVER: http://localhost:${port}`)
