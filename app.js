@@ -27,6 +27,8 @@ app.get('/api/aprendices', (req, res) => {
     });
 });
 
+
+
 //endpoint crear un aprendiz
 app.post("/api/aprendices", (req, res)=>{
     const datoAprendiz = req.body
