@@ -8,11 +8,19 @@
     "avatar": "imagenes/juan.jpg"
   },
   {
-    "dni": 2,
-    "nombre": "Luis",
-    "apellido": "Gomez modificado",
-    "edad": 25,
-    "correo": "luis@example.com",
-    "avatar": "imagenes/luis.jpg"
+    "dni": "2",
+    "nombre": "Pepe",
+    "apellido": "Peres",
+    "edad": "15",
+    "correo": "pp@sena.edu.co",
+    "avatar": "sin imagen"
+  },
+  {
+    "dni": "2",
+    "nombre": "Pepe",
+    "apellido": "Peres",
+    "edad": "15",
+    "correo": "pp@sena.edu.co",
+    "avatar": "sin imagen"
   }
 ]
