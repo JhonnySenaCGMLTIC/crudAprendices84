@@ -1,9 +1,24 @@
 const express = require('express');
+const registroMiddleware = require("./middleware/registroMiddleware")
+const manejadorErrores = require("./middleware/manejadorErrores")
+const autenticarToken = require("./middleware/autenticar")
+const jwtoken = require("jsonwebtoken")
+
 const app = express();
 require('dotenv/config');
 const port = process.env.PUERTO || 3111;
-//body-parser
+//middleware body-parser
 app.use(express.json())
+app.use(express.urlencoded({extended:true}))
+
+//creacion y usu de middleware, ver el tiempo de ejecucion de una peticion
+app.use((req,res, next)=>{
+    const tiempoMilisegundos = Date.now()
+    console.log(`Tiempo: ${tiempoMilisegundos}`)
+    next()
+})
+app.use(registroMiddleware)
+//*app.use()
 
 //utilizacion de librea multer
 const multer = require("multer")
@@ -53,7 +68,7 @@ app.post("/api/aprendices", cargar.single("imagen"),(req, res)=>{
         }
         const listaAprendices = JSON.parse(datos);
         //modificar datoAprendiz con la ruta de la foto
-    datoAprendiz.avatar = req.filename ? `/misImagenes/${req.file.filename}`:"sin imagen"    
+        datoAprendiz.imagen = req.file? `/misImagenes/${req.file.filename}`:"sin imagen"    
         //adicionar a la lista el nuevo aprendiz
         listaAprendices.push(datoAprendiz)
         //adicionar al archivo el nuevo aprendiz
@@ -91,7 +106,40 @@ app.put("/api/aprendices/:dni", (req, res)=>{
         
     })
 })
+//endpoint para provocar un erro
+app.get("/error", (req, res, next)=>{
+    next(new Error("Error provocado"))
+})
 
+//endpoint con ruta protegida
+app.get("/rutaProtegida", autenticarToken,(req,res)=>{
+    res.json({mensaje: "Este es una ruta protegida"})
+})
+
+//endpoint inicio sesion para generar token
+app.post("/login", (req, res)=>{
+    const {usuario, clave} = req.body
+    //simular bd
+    const usuariobd = {
+        "usuario":"jhonny",
+        "clave": "abc123"
+    }
+    //validar datos del usuario
+    if (usuario !== usuariobd.usuario || clave !== usuariobd.clave ){
+        res.json({mensaje: "Usuario y/o clave incorrectos."})
+    }
+    //crear token
+    const token = jwtoken.sign(
+        //pasamos datos del usuario
+        {user: usuario},
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+    )
+    res.json({token})
+})
+
+//manejador de errores
+app.use(manejadorErrores)
 
 // Modo de escucha del servidor
 app.listen(port, () => {
