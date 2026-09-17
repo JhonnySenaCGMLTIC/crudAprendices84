@@ -2,6 +2,7 @@ require("dotenv").config()
 const express = require("express")
 //importar enrutador
 const enrutador = require("./routes")
+
 const app = express()
 
 //middleware formatear datos del body
